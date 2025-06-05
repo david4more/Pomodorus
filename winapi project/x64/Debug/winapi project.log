@@ -1,0 +1,3 @@
+﻿  winapi project.cpp
+C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(210,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  winapi project.vcxproj -> C:\Users\doman\source\repos\winapi project\x64\Debug\winapi project.exe
