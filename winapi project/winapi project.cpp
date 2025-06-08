@@ -30,6 +30,9 @@ struct msg
 const wchar_t* msg::str = L"car";
 
 std::vector<msg> messages;
+HWND hButton;
+const int buttonHeight = 100;
+const int buttonWidth = 300;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -123,10 +126,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    GetClientRect(hWnd, &rect);
    int width = rect.right / 2;
    int height = rect.bottom / 2;
-   int buttonHeight = 100;
-   int buttonWidth = 200;
 
-   HWND hButton = CreateWindow(
+   hButton = CreateWindow(
 	   L"BUTTON", L"XD",
 	   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 	   width - (buttonWidth/2), height - (buttonHeight/2), buttonWidth, buttonHeight,
@@ -169,8 +170,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					GetClientRect(hWnd, &rect);
 
 					messages.push_back(msg(rand() % rect.right, rand() % rect.bottom));
-						  InvalidateRect(hWnd, nullptr, TRUE);
-					UpdateWindow(hWnd);
+					InvalidateRect(hWnd, nullptr, TRUE);
 					break;
 			default:
 				return DefWindowProc(hWnd, message, wParam, lParam);
@@ -187,6 +187,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			EndPaint(hWnd, &ps);
 		}
+		break;
+	case WM_SIZE:
+		RECT window;
+		GetClientRect(hWnd, &window);
+
+		MoveWindow(hButton, (window.right / 2) - (buttonWidth / 2), (window.bottom / 2) - (buttonHeight / 2), buttonWidth, buttonHeight, TRUE);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
