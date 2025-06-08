@@ -1,4 +1,4 @@
-// winapi project.cpp : Defines the entry point for the application.
+﻿// winapi project.cpp : Defines the entry point for the application.
 //
 
 #include "framework.h"
@@ -27,12 +27,16 @@ struct msg
 	int x, y;
 	static const wchar_t* str;
 };
-const wchar_t* msg::str = L"car";
+const wchar_t* msg::str = L"hehe";
 
 std::vector<msg> messages;
 HWND hButton;
-const int buttonHeight = 100;
-const int buttonWidth = 300;
+int buttonHeight;
+int buttonWidth;
+HBRUSH	hbrBackground = NULL;
+
+int countdown = 300;
+bool timerState = false;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -81,6 +85,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
+	if (!hbrBackground)
+		hbrBackground = CreateSolidBrush(RGB(100, 149, 237));
 	WNDCLASSEXW wcex;
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -92,7 +98,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hInstance      = hInstance;
 	wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINAPIPROJECT));
 	wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+	wcex.hbrBackground	= hbrBackground;
 	wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINAPIPROJECT);
 	wcex.lpszClassName  = szWindowClass;
 	wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -124,14 +130,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    RECT rect;
    GetClientRect(hWnd, &rect);
-   int width = rect.right / 2;
-   int height = rect.bottom / 2;
+   int centerX = rect.right / 2;
+   int centerY = rect.bottom / 2;
+   buttonWidth = rect.right / 4;
+   buttonHeight = rect.bottom / 4;
 
    hButton = CreateWindow(
-	   L"BUTTON", L"XD",
+	   L"BUTTON", L"Start timer",
 	   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-	   width - (buttonWidth/2), height - (buttonHeight/2), buttonWidth, buttonHeight,
+	   centerX - (buttonWidth/2), centerY + (centerY / 2) - (buttonHeight / 2), buttonWidth, buttonHeight,
 	   hWnd, (HMENU)1, hInstance, nullptr);
+
+   SetTimer(hWnd, 2, 1000, NULL);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -166,12 +176,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(hWnd);
 					break;
 			case 1:
-					RECT rect;
-					GetClientRect(hWnd, &rect);
+				if (!timerState)
+				{
+					SetWindowText(hButton, L"Stop");
+					timerState = true;
+				}
+				else
+				{
+					SetWindowText(hButton, L"Start");
+					timerState = false;
+				}
 
-					messages.push_back(msg(rand() % rect.right, rand() % rect.bottom));
-					InvalidateRect(hWnd, nullptr, TRUE);
-					break;
+				break;
 			default:
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			}
@@ -189,13 +205,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_SIZE:
-		RECT window;
-		GetClientRect(hWnd, &window);
+		RECT rect;
+		GetClientRect(hWnd, &rect);
 
-		MoveWindow(hButton, (window.right / 2) - (buttonWidth / 2), (window.bottom / 2) - (buttonHeight / 2), buttonWidth, buttonHeight, TRUE);
+		MoveWindow(hButton, (rect.right / 2) - (buttonWidth / 2), (rect.bottom / 2) - (buttonHeight / 2), buttonWidth, buttonHeight, TRUE);
+
+		buttonWidth = rect.right / 4;
+		buttonHeight = rect.bottom / 4;
+
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_TIMER:
+		if (wParam != 2)
+			break;
+
+		if (!timerState)
+			break;
+
+		if (countdown > 0)
+			countdown--;
+
+		InvalidateRect(hWnd, nullptr, TRUE);
+		UpdateWindow(hWnd);
+
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -205,19 +239,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void draw(HDC &hdc, PAINTSTRUCT &ps)
 {
-	HBRUSH hBrush = CreateSolidBrush(RGB(100, 149, 237));
-
-	// Fill the entire client area
-	FillRect(hdc, &ps.rcPaint, hBrush);
-
+	SetBkMode(hdc, TRANSPARENT);
+	
 	for (auto message : messages)
 	{
-		SetBkMode(hdc, TRANSPARENT);
 		TextOut(hdc, message.x, message.y, msg::str, wcslen(msg::str));
 	}
 
-	// Clean up
-	DeleteObject(hBrush);
+	wchar_t buffer[32];
+	swprintf_s(buffer, L"Time: %d", countdown);
+	TextOut(hdc, 10, 10, buffer, wcslen(buffer));
 }
 
 // Message handler for about box.
