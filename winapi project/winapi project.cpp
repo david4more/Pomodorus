@@ -3,8 +3,6 @@
 
 #include "framework.h"
 #include "winapi project.h"
-#include <string>
-#include <vector>
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
@@ -183,7 +181,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) + (timeEditHeight / 2), updateButtonWidth, updateButtonHeight,
 		hWnd, (HMENU)2, hInstance, nullptr);
 
-	mciSendString(L"open \"C:\\Users\\doman\\Downloads\\Mystic Night.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
+	mciSendString(L"open \"alarm.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
 
 	SetWindowPos(hCheckbox, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	SetWindowPos(hEditFirst, hCheckbox, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -365,7 +363,8 @@ void updateCoords(HWND hWnd, int& centerX, int& centerY, int& buttonHeight, int&
 
 void updateFontSize(int& fontSize)
 {
-	fontSize = sqrt(pow(buttonWidth, 2) + pow(buttonHeight, 2)) * -0.25;
+	fontSize = (buttonWidth + buttonHeight) * -0.25;
+	// fontSize = sqrt(pow(buttonWidth, 2) + pow(buttonHeight, 2)) * -0.25;
 }
 
 void toggleTimer(HWND hWnd)
