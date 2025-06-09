@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -20,7 +23,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 // My variables
-void draw(HDC& hdc, HWND hWnd);
+void draw(HDC hdc, HWND hWnd);
 void updateCoords(HWND hWnd, int& centerX, int& centerY, int& buttonHeight, int& buttonWidth);
 void updateFontSize(int& fontSize);
 int centerX, centerY;
@@ -30,8 +33,23 @@ HBRUSH hbrBackground = NULL;
 HFONT buttonFont = NULL;
 RECT rect;
 
-int countdown = 25 * 60;
+int countdown = 0;
 bool timerState = false;
+void toggleTimer(HWND hWnd);
+void activateAlarm(HWND hWnd);
+
+HWND hEditFirst, hEditSecond;
+int timeEditWidth = 25, timeEditHeight = 20;
+int GetTimeValue(HWND hEdit);
+bool inputValidation(HWND hWnd, int& value);
+
+HWND hCheckbox;
+int checkboxWidth = 70, checkboxHeight = 30;
+int cycleNumber = 0, firstCycle = 0, secondCycle = 0;
+bool cyclesMode = false;
+
+HWND hButtonUpdate;
+int updateButtonWidth = 70, updateButtonHeight = 30;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -61,7 +79,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Main message loop:
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg) &&
+			!IsDialogMessage(GetActiveWindow(), &msg))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -139,9 +158,40 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, L"Times New Roman");
 
-	SendMessage(hButton, WM_SETFONT, (WPARAM)buttonFont, TRUE);
+	hEditFirst = CreateWindow(
+		L"EDIT", L"25",
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
+		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
+		hWnd, (HMENU)3, hInstance, nullptr);
 
-	SetTimer(hWnd, 2, 1000, NULL);
+	hEditSecond = CreateWindow(
+		L"EDIT", L"5",
+		WS_TABSTOP| WS_VISIBLE | WS_CHILD  | WS_BORDER | ES_NUMBER,
+		(centerX / 8) + (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
+		hWnd, (HMENU)4, hInstance, nullptr);
+
+	hCheckbox = CreateWindowW(
+		L"BUTTON", L"Cycles",
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight * 2), checkboxWidth, checkboxHeight,
+		hWnd, (HMENU)5, hInst, nullptr);
+	SendMessage(hCheckbox, BM_SETCHECK, BST_CHECKED, 0);
+
+	hButtonUpdate = CreateWindow(
+		L"BUTTON", L"Update",
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) + (timeEditHeight / 2), updateButtonWidth, updateButtonHeight,
+		hWnd, (HMENU)2, hInstance, nullptr);
+
+	mciSendString(L"open \"C:\\Users\\doman\\Downloads\\Mystic Night.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
+
+	SetWindowPos(hCheckbox, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	SetWindowPos(hEditFirst, hCheckbox, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	SetWindowPos(hEditSecond, hEditFirst, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	SetWindowPos(hButtonUpdate, hEditSecond, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	SetWindowPos(hButton, hButtonUpdate, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+	SendMessage(hButton, WM_SETFONT, (WPARAM)buttonFont, TRUE);
 
 	ShowWindow(hWnd, nCmdShow);
 
@@ -175,18 +225,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(hWnd);
 			break;
 		case 1:
-			if (!timerState)
+			toggleTimer(hWnd);
+			break;
+		case 2:
+		{
+			cyclesMode = SendMessage(hCheckbox, BM_GETCHECK, 0, 0) == BST_CHECKED;
+			if (cyclesMode)
 			{
-				SetWindowText(hButton, L"Stop");
-				timerState = true;
+				firstCycle = GetTimeValue(hEditFirst);
+				inputValidation(hWnd, firstCycle);
+				secondCycle = GetTimeValue(hEditSecond);
+				inputValidation(hWnd, secondCycle);
+
+				firstCycle *= 60; secondCycle *= 60;
+
+				countdown = firstCycle;
 			}
 			else
 			{
-				SetWindowText(hButton, L"Start");
-				timerState = false;
+				cycleNumber = 0;
+				int mins = GetTimeValue(hEditFirst);
+				int secs = GetTimeValue(hEditSecond);
+
+				if (!inputValidation(hWnd, mins))
+					secs = 59;
+				else
+					inputValidation(hWnd, secs);
+				countdown = (mins * 60) + secs;
 			}
 
-			break;
+			InvalidateRect(hWnd, nullptr, TRUE);
+		}
+		break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
@@ -202,13 +272,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		EndPaint(hWnd, &ps);
 	}
-	break;
+		break;
 	case WM_SIZE:
+
 		updateCoords(hWnd, centerX, centerY, buttonHeight, buttonWidth);
 		MoveWindow(hButton, centerX - (buttonWidth / 2), (centerY * 1.5) - (buttonHeight / 2), buttonWidth, buttonHeight, TRUE);
 
 		break;
 	case WM_EXITSIZEMOVE:
+
 		if (buttonFont)
 			DeleteObject(buttonFont);
 
@@ -225,38 +297,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		break;
 	case WM_DESTROY:
-		if (hbrBackground) DeleteObject(hbrBackground);
-		if (buttonFont) DeleteObject(buttonFont);
+		DestroyWindow(hButton);
+		DestroyWindow(hEditFirst);
+		DestroyWindow(hEditSecond);
+		DestroyWindow(hCheckbox);
+		DestroyWindow(hButtonUpdate);
+
+		if (hbrBackground) 
+			DeleteObject(hbrBackground);
+		if (buttonFont) 
+			DeleteObject(buttonFont);
+		if (timerState)
+			toggleTimer(hWnd);
+		mciSendString(L"close alarm", NULL, 0, NULL);
+		
 		PostQuitMessage(0);
 		break;
 	case WM_TIMER:
-		if (wParam != 2)
-			break;
 
-		if (!timerState)
-			break;
-
-		if (countdown < 0)
-			break;
-		
 		countdown--;
-		InvalidateRect(hWnd, nullptr, TRUE);
+		if (countdown <= 0)
+		{
+			countdown = 0;
+			toggleTimer(hWnd);
+			activateAlarm(hWnd);
+		}
+		else
+			InvalidateRect(hWnd, nullptr, TRUE);
 
+		break; 
+	case WM_CREATE:
+		PostMessage(hWnd, WM_COMMAND, 2, 0);
 		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
 }
 
-void draw(HDC& hdc, HWND hWnd)
+void draw(HDC hdc, HWND hWnd)
 {
 	SetBkMode(hdc, TRANSPARENT);
 	SelectObject(hdc, buttonFont);
 
 	wchar_t buffer[32];
-	swprintf_s(buffer, L"Time: %02d:%02d", countdown / 60, countdown % 60);
 
+	if (cyclesMode)
+		swprintf_s(buffer, L"%s: %02d:%02d", (cycleNumber % 2 == 0) ? L"Work" : L"Rest", countdown / 60, countdown % 60);
+	else
+		swprintf_s(buffer, L"Time: %02d:%02d", countdown / 60, countdown % 60);
+	
 	RECT rect;
 	GetClientRect(hWnd, &rect);
 	DrawText(hdc, buffer, -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -274,7 +365,58 @@ void updateCoords(HWND hWnd, int& centerX, int& centerY, int& buttonHeight, int&
 
 void updateFontSize(int& fontSize)
 {
-	fontSize = buttonHeight * -0.5;
+	fontSize = sqrt(pow(buttonWidth, 2) + pow(buttonHeight, 2)) * -0.25;
+}
+
+void toggleTimer(HWND hWnd)
+{
+	if (timerState)
+	{
+		SetWindowText(hButton, L"Start");
+		KillTimer(hWnd, 2);
+		timerState = false;
+	}
+	else
+	{
+		SetWindowText(hButton, L"Stop");
+		SetTimer(hWnd, 2, 1000, NULL);
+		timerState = true;
+	}
+}
+
+void activateAlarm(HWND hWnd)
+{
+	InvalidateRect(hWnd, nullptr, TRUE);
+
+	mciSendString(L"seek alarm to start", NULL, 0, NULL);
+	mciSendString(L"play alarm", NULL, 0, NULL);
+	MessageBox(hWnd, L"⏰ Timer expired!", L"Alarm", MB_OK);
+	mciSendString(L"stop alarm", NULL, 0, NULL);
+
+	if (cyclesMode)
+	{
+		cycleNumber++;
+		countdown = (cycleNumber % 2 == 0) ? firstCycle : secondCycle;
+		toggleTimer(hWnd);
+		InvalidateRect(hWnd, nullptr, TRUE);
+	}
+}
+
+bool inputValidation(HWND hWnd, int& value)
+{
+	if (value <= 59)
+		return true;
+
+	value = 59;
+	MessageBox(hWnd, L"Variable value is out of bounds.", L"Invalid input", MB_OK);
+	return false;
+}
+
+int GetTimeValue(HWND hEdit)
+{
+	wchar_t buffer[16];
+	GetWindowText(hEdit, buffer, sizeof(buffer) / sizeof(buffer[0]));
+	return _wtoi(buffer);
 }
 
 // Message handler for about box.
