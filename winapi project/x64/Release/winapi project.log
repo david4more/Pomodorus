@@ -1,0 +1,9 @@
+﻿  winapi project.cpp
+C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(145,12): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(277,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(366,42): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 16 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  winapi project.vcxproj -> C:\Users\doman\source\repos\winapi project\x64\Release\winapi project.exe
