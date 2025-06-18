@@ -146,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		L"BUTTON", L"Start",
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 		centerX - (buttonWidth / 2), (centerY * 1.5) - (buttonHeight / 2), buttonWidth, buttonHeight,
-		hWnd, (HMENU)1, hInstance, nullptr);
+		hWnd, (HMENU)1001, hInstance, nullptr);
 
 	updateFontSize(fontSize);
 	buttonFont = CreateFont(
@@ -156,38 +156,32 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, L"Times New Roman");
 
+	hCheckbox = CreateWindowW(
+		L"BUTTON", L"Cycles",
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight * 2), checkboxWidth, checkboxHeight,
+		hWnd, (HMENU)1003, hInst, nullptr);
+	SendMessage(hCheckbox, BM_SETCHECK, BST_CHECKED, 0);
+
 	hEditFirst = CreateWindow(
 		L"EDIT", L"25",
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
 		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
-		hWnd, (HMENU)3, hInstance, nullptr);
+		hWnd, (HMENU)1004, hInstance, nullptr);
 
 	hEditSecond = CreateWindow(
 		L"EDIT", L"5",
 		WS_TABSTOP| WS_VISIBLE | WS_CHILD  | WS_BORDER | ES_NUMBER,
 		(centerX / 8) + (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
-		hWnd, (HMENU)4, hInstance, nullptr);
-
-	hCheckbox = CreateWindowW(
-		L"BUTTON", L"Cycles",
-		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
-		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight * 2), checkboxWidth, checkboxHeight,
-		hWnd, (HMENU)5, hInst, nullptr);
-	SendMessage(hCheckbox, BM_SETCHECK, BST_CHECKED, 0);
+		hWnd, (HMENU)1005, hInstance, nullptr);
 
 	hButtonUpdate = CreateWindow(
 		L"BUTTON", L"Update",
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) + (timeEditHeight / 2), updateButtonWidth, updateButtonHeight,
-		hWnd, (HMENU)2, hInstance, nullptr);
+		hWnd, (HMENU)1002, hInstance, nullptr);
 
 	mciSendString(L"open \"alarm.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
-
-	SetWindowPos(hCheckbox, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	SetWindowPos(hEditFirst, hCheckbox, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	SetWindowPos(hEditSecond, hEditFirst, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	SetWindowPos(hButtonUpdate, hEditSecond, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	SetWindowPos(hButton, hButtonUpdate, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	SendMessage(hButton, WM_SETFONT, (WPARAM)buttonFont, TRUE);
 
@@ -222,12 +216,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
-		case 1:
+		case 1001:
 			toggleTimer(hWnd);
 			break;
-		case 2:
+		case 1002:
 		{
 			cyclesMode = SendMessage(hCheckbox, BM_GETCHECK, 0, 0) == BST_CHECKED;
+			cycleNumber = 0;
 			if (cyclesMode)
 			{
 				firstCycle = GetTimeValue(hEditFirst);
@@ -241,7 +236,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				cycleNumber = 0;
 				int mins = GetTimeValue(hEditFirst);
 				int secs = GetTimeValue(hEditSecond);
 
@@ -264,7 +258,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		// TODO: Add any drawing code that uses hdc here...
 
 		draw(hdc, hWnd);
 
@@ -322,12 +315,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else
 			InvalidateRect(hWnd, nullptr, TRUE);
-
 		break; 
 	case WM_CREATE:
-		PostMessage(hWnd, WM_COMMAND, 2, 0);
+		PostMessage(hWnd, WM_COMMAND, 1002, 0);
 		break;
-
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -372,13 +363,13 @@ void toggleTimer(HWND hWnd)
 	if (timerState)
 	{
 		SetWindowText(hButton, L"Start");
-		KillTimer(hWnd, 2);
+		KillTimer(hWnd, 1006);
 		timerState = false;
 	}
 	else
 	{
 		SetWindowText(hButton, L"Stop");
-		SetTimer(hWnd, 2, 1000, NULL);
+		SetTimer(hWnd, 1006, 1000, NULL);
 		timerState = true;
 	}
 }
