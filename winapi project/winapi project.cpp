@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "winapi project.h"
+#include <string>
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
@@ -43,11 +44,13 @@ bool inputValidation(HWND hWnd, int& value);
 
 HWND hCheckbox;
 int checkboxWidth = 70, checkboxHeight = 30;
-int cycleNumber = 0, firstCycle = 0, secondCycle = 0;
+int cycleNumber = 0, firstCycle = 2, secondCycle = 1;
 bool cyclesMode = false;
 
 HWND hButtonUpdate;
 int updateButtonWidth = 70, updateButtonHeight = 30;
+
+bool debug = false;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -60,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// TODO: Place code here.
 
 	// Initialize global strings
-	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	wcscpy_s(szTitle, L"Pomodorus the Focus Mage");
 	LoadStringW(hInstance, IDC_WINAPIPROJECT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
@@ -140,6 +143,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
+	
+
 	updateCoords(hWnd, centerX, centerY, buttonHeight, buttonWidth);
 
 	hButton = CreateWindow(
@@ -164,13 +169,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	SendMessage(hCheckbox, BM_SETCHECK, BST_CHECKED, 0);
 
 	hEditFirst = CreateWindow(
-		L"EDIT", L"25",
+		L"EDIT", std::to_wstring(firstCycle).c_str(),
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
 		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
 		hWnd, (HMENU)1004, hInstance, nullptr);
 
 	hEditSecond = CreateWindow(
-		L"EDIT", L"5",
+		L"EDIT", std::to_wstring(secondCycle).c_str(),
 		WS_TABSTOP| WS_VISIBLE | WS_CHILD  | WS_BORDER | ES_NUMBER,
 		(centerX / 8) + (timeEditWidth / 2), (centerY / 4) - (timeEditHeight / 2), timeEditWidth, timeEditHeight,
 		hWnd, (HMENU)1005, hInstance, nullptr);
@@ -182,7 +187,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		hWnd, (HMENU)1002, hInstance, nullptr);
 
 	mciSendString(L"open \"alarm.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
-
+	
 	SendMessage(hButton, WM_SETFONT, (WPARAM)buttonFont, TRUE);
 
 	ShowWindow(hWnd, nCmdShow);
@@ -230,7 +235,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				secondCycle = GetTimeValue(hEditSecond);
 				inputValidation(hWnd, secondCycle);
 
-				firstCycle *= 60; secondCycle *= 60;
+				if (!debug)
+				{
+					firstCycle *= 60; secondCycle *= 60;
+				}
 
 				countdown = firstCycle;
 			}
@@ -254,6 +262,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -264,14 +273,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 		break;
-	case WM_SIZE:
 
+	case WM_SIZE:
 		updateCoords(hWnd, centerX, centerY, buttonHeight, buttonWidth);
 		MoveWindow(hButton, centerX - (buttonWidth / 2), (centerY * 1.5) - (buttonHeight / 2), buttonWidth, buttonHeight, TRUE);
 
 		break;
-	case WM_EXITSIZEMOVE:
 
+	case WM_EXITSIZEMOVE:
 		if (buttonFont)
 			DeleteObject(buttonFont);
 
@@ -287,6 +296,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hWnd, nullptr, TRUE);
 
 		break;
+
 	case WM_DESTROY:
 		DestroyWindow(hButton);
 		DestroyWindow(hEditFirst);
@@ -304,21 +314,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		PostQuitMessage(0);
 		break;
-	case WM_TIMER:
 
+	case WM_TIMER:
 		countdown--;
 		if (countdown <= 0)
-		{
-			countdown = 0;
-			toggleTimer(hWnd);
 			activateAlarm(hWnd);
-		}
-		else
-			InvalidateRect(hWnd, nullptr, TRUE);
+
+		InvalidateRect(hWnd, nullptr, TRUE);
 		break; 
+
 	case WM_CREATE:
 		PostMessage(hWnd, WM_COMMAND, 1002, 0);
 		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -327,6 +335,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void draw(HDC hdc, HWND hWnd)
 {
+	updateCoords(hWnd, centerX, centerY, buttonHeight, buttonWidth);
+
 	SetBkMode(hdc, TRANSPARENT);
 	SelectObject(hdc, buttonFont);
 
@@ -337,8 +347,6 @@ void draw(HDC hdc, HWND hWnd)
 	else
 		swprintf_s(buffer, L"Time: %02d:%02d", countdown / 60, countdown % 60);
 	
-	RECT rect;
-	GetClientRect(hWnd, &rect);
 	DrawText(hdc, buffer, -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 }
 
@@ -376,20 +384,39 @@ void toggleTimer(HWND hWnd)
 
 void activateAlarm(HWND hWnd)
 {
-	InvalidateRect(hWnd, nullptr, TRUE);
-
 	mciSendString(L"seek alarm to start", NULL, 0, NULL);
 	mciSendString(L"play alarm", NULL, 0, NULL);
-	MessageBox(hWnd, L"⏰ Timer expired!", L"Alarm", MB_OK);
-	mciSendString(L"stop alarm", NULL, 0, NULL);
+
+	toggleTimer(hWnd);
+	countdown = 0;
+	InvalidateRect(hWnd, nullptr, TRUE);
+	UpdateWindow(hWnd);
+
+	auto title = L"⏰ The Chronomancer's Bell";
 
 	if (cyclesMode)
 	{
+		auto workEnd = L"🧙‍ Your toil is done, brave soul. Take this moment to breathe and be still. 🌬✨";
+		auto restEnd = L"🧙‍ The time has come to rise — your craft awaits once more. 🔥⚡";
+		auto greatRestTitle = L"🌕 Council of the Long Rest";
+		auto greatRestText = L"🧙‍ Four cycles have passed, tireless one. Would you accept a longer rest beneath the moon’s soft light? 🌙🛌";
+
 		cycleNumber++;
 		countdown = (cycleNumber % 2 == 0) ? firstCycle : secondCycle;
+
+		if ((cycleNumber != 0 && cycleNumber == 7) && MessageBox(hWnd, greatRestText, greatRestTitle, MB_YESNO) == IDYES)
+			countdown = firstCycle;
+		else
+			MessageBox(hWnd, (cycleNumber % 2 == 0) ? restEnd : workEnd, title, MB_OK);
+
+		if (cycleNumber == 8) cycleNumber = 0;
+
 		toggleTimer(hWnd);
-		InvalidateRect(hWnd, nullptr, TRUE);
 	}
+	else
+		MessageBox(hWnd, L"🧙‍ Time's flow has ceased — the countdown is complete! ⌛🔮", title, MB_OK);
+
+	mciSendString(L"stop alarm", NULL, 0, NULL);
 }
 
 bool inputValidation(HWND hWnd, int& value)
