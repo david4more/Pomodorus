@@ -3,15 +3,23 @@
   "WorkspaceRootPath": "C:\\Users\\doman\\source\\repos\\pomodorus\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.rc||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|solutionrelative:winapi project\\winapi project.rc||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\small.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:winapi project\\small.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:winapi project\\winapi project.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|solutionrelative:winapi project\\winapi project.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\doman\\Downloads\\tomato.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}",
-      "RelativeMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|solutionrelative:winapi project\\winapi project.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}"
+      "AbsoluteMoniker": "D:0:0:{DCB0047A-270E-4660-BD36-B73B1F002D59}|winapi project\\winapi project.vcxproj|C:\\Users\\doman\\Downloads\\tomato.ico||{177559E0-D141-11D0-92DF-00A0C9138C45}"
     }
   ],
   "DocumentGroupContainers": [
@@ -21,7 +29,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -33,7 +41,44 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "winapi project.rc",
+              "DocumentMoniker": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.rc",
+              "RelativeDocumentMoniker": "winapi project\\winapi project.rc",
+              "ToolTip": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.rc",
+              "RelativeToolTip": "winapi project\\winapi project.rc",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACYAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2025-07-28T10:18:16.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "DocumentMoniker": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico",
+              "RelativeDocumentMoniker": "winapi project\\winapi project.ico",
+              "ToolTip": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "RelativeToolTip": "winapi project\\winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001525|",
+              "WhenOpened": "2025-07-28T10:16:24.175Z",
+              "EditorCaption": " -  [English (United States)] - Icon [256x256, 32 bit, PNG]"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "small.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "DocumentMoniker": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\small.ico",
+              "RelativeDocumentMoniker": "winapi project\\small.ico",
+              "ToolTip": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\small.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "RelativeToolTip": "winapi project\\small.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001525|",
+              "WhenOpened": "2025-07-28T10:16:19.329Z",
+              "EditorCaption": " -  [English (United States)] - Icon [256x256, 32 bit, PNG]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "tomato.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
               "DocumentMoniker": "C:\\Users\\doman\\Downloads\\tomato.ico",
               "RelativeDocumentMoniker": "..\\..\\..\\Downloads\\tomato.ico",
@@ -45,25 +90,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
-              "DocumentMoniker": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico",
-              "RelativeDocumentMoniker": "winapi project\\winapi project.ico",
-              "ToolTip": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
-              "RelativeToolTip": "winapi project\\winapi project.ico -  [English (United States)] - Icon [256x256, 32 bit, PNG]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001525|",
-              "WhenOpened": "2025-07-28T10:10:27.335Z",
-              "EditorCaption": " -  [English (United States)] - Icon [256x256, 32 bit, PNG]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "winapi project.cpp",
               "DocumentMoniker": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.cpp",
               "RelativeDocumentMoniker": "winapi project\\winapi project.cpp",
               "ToolTip": "C:\\Users\\doman\\source\\repos\\pomodorus\\winapi project\\winapi project.cpp",
               "RelativeToolTip": "winapi project\\winapi project.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAA5AAAAAAAAAA==",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAADUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-06-11T15:11:21.289Z",
               "EditorCaption": ""
