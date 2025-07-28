@@ -42,15 +42,15 @@ int timeEditWidth = 25, timeEditHeight = 20;
 int GetTimeValue(HWND hEdit);
 bool inputValidation(HWND hWnd, int& value);
 
+bool debug = false;											// debug mode
+
 HWND hCheckbox;
 int checkboxWidth = 70, checkboxHeight = 30;
-int cycleNumber = 0, firstCycle = 2, secondCycle = 1;
+int cycleNumber = 0, firstCycle = 25, secondCycle = 5;
 bool cyclesMode = false;
 
 HWND hButtonUpdate;
 int updateButtonWidth = 70, updateButtonHeight = 30;
-
-bool debug = false;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -63,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// TODO: Place code here.
 
 	// Initialize global strings
-	wcscpy_s(szTitle, L"Pomodorus the Focus Mage");
+	wcscpy_s(szTitle, L"Pomodorus the Focus Sage");
 	LoadStringW(hInstance, IDC_WINAPIPROJECT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
@@ -143,6 +143,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
+	if (debug)
+	{
+		firstCycle = 0;
+		secondCycle = 0;
+	}
 	
 
 	updateCoords(hWnd, centerX, centerY, buttonHeight, buttonWidth);
@@ -185,6 +190,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 		(centerX / 8) - (timeEditWidth / 2), (centerY / 4) + (timeEditHeight / 2), updateButtonWidth, updateButtonHeight,
 		hWnd, (HMENU)1002, hInstance, nullptr);
+
 
 	mciSendString(L"open \"alarm.mp3\" type mpegvideo alias alarm", NULL, 0, NULL);
 	
@@ -235,10 +241,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				secondCycle = GetTimeValue(hEditSecond);
 				inputValidation(hWnd, secondCycle);
 
-				if (!debug)
-				{
-					firstCycle *= 60; secondCycle *= 60;
-				}
+				firstCycle *= 60; secondCycle *= 60;
 
 				countdown = firstCycle;
 			}

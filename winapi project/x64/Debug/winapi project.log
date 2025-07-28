@@ -1,5 +1,1 @@
-﻿  winapi project.cpp
-C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(150,12): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(279,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\doman\source\repos\winapi project\winapi project\winapi project.cpp(365,42): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-  winapi project.vcxproj -> C:\Users\doman\source\repos\winapi project\x64\Debug\winapi project.exe
+﻿  winapi project.vcxproj -> C:\Users\doman\source\repos\pomodorus\x64\Debug\winapi project.exe
